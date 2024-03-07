@@ -1,0 +1,13 @@
+version: '3.2'
+
+services:
+  react-redux:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT}:3000"
+    volumes:
+      - .:/app
+    command:
+      sh -c "npm install && npm run dev"
