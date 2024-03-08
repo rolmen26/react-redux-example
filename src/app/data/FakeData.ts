@@ -1,53 +1,12 @@
-export const UserData = [
-    {
-        id: 1,
-        name: "John Doe",
-        username: "johndoe",
-    },
-    {
-        id: 2,
-        name: "Jane Doe",
-        username: "janedoe",
-    },
-    {
-        id: 3,
-        name: "John Smith",
-        username: "johnsmith",
-    },
-    {
-        id: 4,
-        name: "Jane Smith",
-        username: "janesmith",
+import axios from 'axios';
+import { Users } from '../types/Users'
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
-    },
-    {
-        id: 5,
-        name: "John Johnson",
-        username: "johnjohnson",
-    },
-    {
-        id: 6,
-        name: "Jane Johnson",
-        username: "janejohnson",
-    },
-    {
-        id: 7,
-        name: "John Brown",
-        username: "johnbrown",
-    },
-    {
-        id: 8,
-        name: "Jane Brown",
-        username: "janebrown",
-    },
-    {
-        id: 9,
-        name: "John Davis",
-        username: "johndavis",
-    },
-    {
-        id: 10,
-        name: "Jane Davis",
-        username: "janedavis",
+
+export const fetchUsers = createAsyncThunk(
+    "users/fetchUsers",
+    async () => {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/users');
+        return response.data as Users[];
     }
-]
+);

@@ -1,20 +1,37 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserData } from '../data/FakeData'
+import { Users } from '../types/Users'
+import { fetchUsers } from "../data/FakeData";
 
 const usersSlice = createSlice({
     name: "users",
-    initialState: { value: UserData },
+    initialState: {
+        isLoading: false,
+        data: [] as Users[],
+        isError: false,
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchUsers.pending, (state) => {
+            state.isLoading = true;
+        });
+        builder.addCase(fetchUsers.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.data = action.payload;
+        });
+        builder.addCase(fetchUsers.rejected, (state) => {
+            state.isError = true;
+        });
+    },
     reducers: {
         addUser: (state, action) => {
-            state.value.push(action.payload);
+            state.data = state.data.concat(action.payload);
         },
 
         deleteUser: (state, action) => {
-            state.value = state.value.filter((user) => user.id !== action.payload.id);
+            state.data = state.data.filter((user) => user.id !== action.payload.id);
         },
 
         updateUsername: (state, action) => {
-            state.value.map((user) => {
+            state.data.map((user) => {
                 if (user.id === action.payload.id) {
                     user.username = action.payload.username;
                 }
