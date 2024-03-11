@@ -3,16 +3,11 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { addUser, deleteUser, updateUsername } from './app/features/Users';
 import { fetchUsers } from './app/data/FakeData';
-
-interface User {
-    id: number;
-    name: string;
-    username: string;
-}
+import { RootState } from './app/store';
 
 const App: React.FC = () => {
 
-    const users = useSelector((state: any) => state.users);
+    const users = useSelector((state: RootState) => state.users);
 
     useEffect(() => {
         dispatch(fetchUsers() as any);
@@ -33,10 +28,10 @@ const App: React.FC = () => {
             <div className="addUser">
                 <input type="text" className="text" placeholder='Name...' onChange={(event) => { setName(event.target.value) }} />
                 <input type="text" className="text" placeholder='Username...' onChange={(event) => { setUsername(event.target.value) }} />
-                <button onClick={() => { dispatch(addUser({ id: users[users.length - 1].id + 1, name, username })) }}>Add User</button>
+                <button onClick={() => { dispatch(addUser({ id: users.data[users.data.length - 1].id + 1, name, username })) }}>Add User</button>
             </div>
             <div className="displayUsers">
-                {users?.isLoading ? <h1>Loading... </h1> : users?.isError ? <h1>Error... </h1> : users?.data.map((user: User) => {
+                {users?.isLoading ? <h1>Loading... </h1> : users?.isError ? <h1>Error... </h1> : users?.data.map((user) => {
                     return (
                         <div key={user.id} className="user">
                             <h1>{user.name}</h1>
