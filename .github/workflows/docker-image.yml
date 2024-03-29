@@ -1,25 +1,22 @@
-name: React-Redux CI/CD to GitHub Pages
+name: React-Redux CI/CD
 
 on:
   push:
-    branches:
-      - master  # Change this to your default branch if it's not master
+    branches: [ master ]
   pull_request:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-    - name: Setup Node.js
+    - name: Use Node.js 20
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Specify the Node.js version you are using
+        node-version: '20'
 
     - name: Install dependencies
       run: npm install
@@ -30,6 +27,6 @@ jobs:
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.4
       with:
-        branch: gh-pages  # The branch you are deploying to
-        folder: dist  # The folder the action should deploy
-        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages  # The branch the action should deploy to.
+        folder: dist  # The folder the action should deploy.
+        token: ${{ secrets.GITHUB_TOKEN }} 
