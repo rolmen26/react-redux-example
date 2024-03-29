@@ -1,44 +1,35 @@
-name: React-Redux CI/CD
+name: React-Redux CI/CD to GitHub Pages
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master  # Change this to your default branch if it's not master
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    outputs:
-      build-folder: 'dist'
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Use Node.js 20
+    - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '20'
+        node-version: '14'  # Specify the Node.js version you are using
 
     - name: Install dependencies
       run: npm install
 
     - name: Build
       run: npm run build
-      # Here, you can add any other steps you need for your Jekyll site build, 
-      # such as setting up Ruby and Jekyll, building the site, etc.
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.4
       with:
-        branch: gh-pages  # The branch the action should deploy to.
-        folder: dist
-        token: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication.
+        branch: gh-pages  # The branch you are deploying to
+        folder: build  # The folder the action should deploy
+        token: ${{ secrets.GITHUB_TOKEN }}
