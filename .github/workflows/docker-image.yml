@@ -1,4 +1,4 @@
-name: Jekyll site CI/CD
+name: React-Redux CI/CD
 
 on:
   push:
@@ -9,28 +9,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      build-folder: 'dist'
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
+    - name: Use Node.js 20
+      uses: actions/setup-node@v2
       with:
-        ruby-version: '3.0'  # Choose the Ruby version compatible with your Jekyll site
+        node-version: '20'
 
     - name: Install dependencies
-      run: |
-        gem install bundler
-        bundle install
+      run: npm install
 
-    - name: Build Jekyll site
-      run: bundle exec jekyll build
-
-    - name: Save built site
-      uses: actions/upload-artifact@v2
-      with:
-        name: site
-        path: _site  # Or whatever your Jekyll build output directory is
+    - name: Build
+      run: npm run build
+      # Here, you can add any other steps you need for your Jekyll site build, 
+      # such as setting up Ruby and Jekyll, building the site, etc.
 
   deploy:
     needs: build
@@ -38,21 +34,12 @@ jobs:
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: gh-pages  # Check out the branch to deploy to
-
-    - name: Download built site
-      uses: actions/download-artifact@v2
-      with:
-        name: site
-        path: _site
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
     - name: Deploy to GitHub Pages
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        cp -r _site/* .  # Copy the built site files to the root directory for deployment
-        git add .
-        git commit -m "Deploy Jekyll site to GitHub Pages"
-        git push origin gh-pages
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages  # The branch the action should deploy to.
+        folder: ${{ needs.build.outputs.build-folder }}  # The folder the action should deploy, from the output of the build job.
+        token: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication.
