@@ -1,4 +1,4 @@
-name: React-Redux CI/CD
+name: Jekyll site CI/CD
 
 on:
   push:
@@ -7,26 +7,52 @@ on:
     branches: [ master ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Use Node.js 20
-      uses: actions/setup-node@v2
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
       with:
-        node-version: '20'
+        ruby-version: '3.0'  # Choose the Ruby version compatible with your Jekyll site
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        gem install bundler
+        bundle install
 
-    - name: Build
-      run: npm run build
+    - name: Build Jekyll site
+      run: bundle exec jekyll build
+
+    - name: Save built site
+      uses: actions/upload-artifact@v2
+      with:
+        name: site
+        path: _site  # Or whatever your Jekyll build output directory is
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: gh-pages  # Check out the branch to deploy to
+
+    - name: Download built site
+      uses: actions/download-artifact@v2
+      with:
+        name: site
+        path: _site
 
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@4.1.4
-      with:
-        branch: gh-pages  # The branch the action should deploy to.
-        folder: dist  # The folder the action should deploy.
-        token: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication.
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        cp -r _site/* .  # Copy the built site files to the root directory for deployment
+        git add .
+        git commit -m "Deploy Jekyll site to GitHub Pages"
+        git push origin gh-pages
