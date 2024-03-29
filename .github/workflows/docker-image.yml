@@ -40,5 +40,5 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@4.1.4
       with:
         branch: gh-pages  # The branch the action should deploy to.
-        folder: ${{ needs.build.outputs.build-folder }}  # The folder the action should deploy, from the output of the build job.
+        folder: dist
         token: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication.
