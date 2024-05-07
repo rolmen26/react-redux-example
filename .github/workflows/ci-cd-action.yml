@@ -23,11 +23,7 @@ jobs:
 
     - name: Save output
       run: |
-        {
-          echo "dist=$PWD/dist"
-          ls -las ./dist
-        } >> $GITHUB_ENV
-
+        echo "dist=$PWD/dist" >> $GITHUB_ENV
     - name: Verify Build Output
       run: ls -las ./dist
 
