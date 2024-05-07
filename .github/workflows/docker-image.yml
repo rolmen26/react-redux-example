@@ -39,12 +39,9 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
 
-    - name: Set up environment
-      run: echo "dist=${{ needs.build.outputs.dist }}" >> $GITHUB_ENV
-
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.4
       with:
         branch: gh-pages
-        folder: ${{ env.dist }}
+        folder: ${{ needs.build.outputs.dist }}
         token: ${{ secrets.GITHUB_TOKEN }}
