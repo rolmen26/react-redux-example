@@ -46,12 +46,6 @@ jobs:
         name: dist
         path: dist
 
-    - name: Verify Build Output
-      run: ls -las ./dist
-
-    - name: Check index.html
-      run: cat ./dist/index.html
-    
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
