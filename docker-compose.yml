@@ -4,7 +4,7 @@ services:
   react-redux:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "${APP_PORT}:3000"
     volumes:
