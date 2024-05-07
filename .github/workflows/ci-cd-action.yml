@@ -21,9 +21,12 @@ jobs:
     - name: Copy Build Output
       run: docker cp react-redux-container:/app/dist .
 
-    - name: Save output
-      run: |
-        echo "dist=$PWD/dist" >> $GITHUB_ENV
+    - name: Upload Build Output
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist
+
     - name: Verify Build Output
       run: ls -las ./dist
 
@@ -37,9 +40,14 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
 
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@4.1.4
+    - name: Download Build Output
+      uses: actions/download-artifact@v2
       with:
-        branch: gh-pages
-        folder: ${{ env.dist }}
-        token: ${{ secrets.GITHUB_TOKEN }}
+        name: dist
+    
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: dist
