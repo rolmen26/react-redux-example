@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      dist: ${{ steps.save_output.outputs.dist }}
-
     steps:
     - uses: actions/checkout@v2
 
