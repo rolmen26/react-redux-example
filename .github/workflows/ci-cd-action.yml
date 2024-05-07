@@ -44,6 +44,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: dist
+        path: dist
 
     - name: Verify Build Output
       run: ls -las ./dist
