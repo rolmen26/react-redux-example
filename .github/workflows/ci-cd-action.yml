@@ -23,7 +23,8 @@ jobs:
 
     - name: Save Build Output
       id: save_output
-      run: echo "dist=$(realpath dist)" >> $GITHUB_ENV
+      run: echo "dist=./dist" >> $GITHUB_ENV
+
 
     - name: Cleanup
       run: docker rm -f react-redux-container
