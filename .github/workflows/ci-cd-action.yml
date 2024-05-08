@@ -15,6 +15,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Login to Docker Registry
         uses: azure/docker-login@v1
         with:
@@ -23,25 +31,30 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build Docker Image
-        run: docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }} .
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP .
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP
 
-      - name: Push Docker Image
-        run: docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}
+      - name: Scan Docker Image
+        run: |
+          docker scan ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP
+
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Login to Azure
-        uses: azure/login@v1
+        uses: azure/login@v1.4.0
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure Container Instances
-        uses: azure/aci-deploy@v1
+        uses: azure/aci-deploy@v1.1.3
         with:
           resource-group: grupo-node
-          dns-name-label: react-redux-app-${{ github.run_id }}
+          dns-name-label: react-redux-example
           image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}
           registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
