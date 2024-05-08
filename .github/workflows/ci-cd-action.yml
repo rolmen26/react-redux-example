@@ -51,7 +51,7 @@ jobs:
         with:
           resource-group: grupo-node
           dns-name-label: react-redux-example
-          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP
           registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
