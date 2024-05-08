@@ -36,10 +36,6 @@ jobs:
           docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP .
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP
 
-      - name: Scan Docker Image
-        run: |
-          docker scan ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP
-
 
   deploy:
     runs-on: ubuntu-latest
