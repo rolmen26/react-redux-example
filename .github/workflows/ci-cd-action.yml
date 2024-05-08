@@ -32,9 +32,9 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP .
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP
+          docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }} .
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}
+
 
 
   deploy:
@@ -51,7 +51,7 @@ jobs:
         with:
           resource-group: grupo-node
           dns-name-label: react-redux-example
-          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}-$TIMESTAMP
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}
           registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
