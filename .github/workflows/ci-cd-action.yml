@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
   id-token: write
 
 jobs:
@@ -18,48 +17,36 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build Docker Image
-        run: docker build -t react-redux-app .
-
-      - name: Run Docker Container
-        run: docker run --name react-redux-container react-redux-app
-
-      - name: Copy Build Output
-        run: docker cp react-redux-container:/app/dist .
-
-      - name: Upload Build Output
-        uses: actions/upload-artifact@v4
+      - name: Login to Docker Registry
+        uses: azure/docker-login@v1
         with:
-          name: dist
-          path: dist
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Verify Build Output
-        run: ls -las ./dist
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }} .
 
-      - name: Cleanup
-        run: docker rm -f react-redux-container
+      - name: Push Docker Image
+        run: docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Download Build Output
-        uses: actions/download-artifact@v4
+      - name: Login to Azure
+        uses: azure/login@v1
         with:
-          name: dist
-          path: dist
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to Azure Container Instances
+        uses: azure/aci-deploy@v1
         with:
-          path: "dist"
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          resource-group: MyResourceGroup
+          dns-name-label: react-redux-app-${{ github.run_id }}
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/react-redux-app:${{ github.sha }}
+          registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: react-redux-app
+          location: eastus

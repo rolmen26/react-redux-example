@@ -1,4 +1,4 @@
-FROM node:20.11.1-alpine3.19
+FROM node:20.11.1-alpine3.19 as builder
 
 WORKDIR /app
 
@@ -9,3 +9,13 @@ RUN npm ci
 COPY . .
 
 RUN npm run build
+
+FROM nginx:alpine3.18 as production-stage
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+COPY ./etc/nginx/default.conf /etc/nginx/conf.d
+
+EXPOSE 3000
+
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
